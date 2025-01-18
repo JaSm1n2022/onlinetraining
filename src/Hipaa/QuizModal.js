@@ -1,5 +1,5 @@
 import { Close } from "@mui/icons-material";
-import { Grid, Modal, Paper, Typography } from "@mui/material";
+import { Button, Grid, Modal, Paper, Typography } from "@mui/material";
 
 export default function QuizModal(props) {
   const { isOpen } = props;
@@ -23,6 +23,15 @@ export default function QuizModal(props) {
         </Grid>
         <div style={{ paddingTop: 40, paddingBottom: 40 }}>
           <Typography variant="h6">{`Congratulations! You total score is ${props.score}%`}</Typography>
+        </div>
+        <div style={{ paddingTop: 40, paddingBottom: 40 }}>
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={() => props.downloadCertificateHandler()}
+          >
+            Download Certificate
+          </Button>
         </div>
       </div>
     </Paper>

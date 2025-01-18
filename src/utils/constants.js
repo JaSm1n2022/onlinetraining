@@ -165,13 +165,9 @@ export const IN_SERVICES = [
     topic: "HIPAA",
     title: "Quiz",
   },
+
   {
     seq: 11,
-    topic: "HIPAA",
-    title: "Attendance",
-  },
-  {
-    seq: 12,
     topic: "HIPAA",
     title: "Certificate",
   },

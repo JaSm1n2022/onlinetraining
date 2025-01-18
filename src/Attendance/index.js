@@ -1,8 +1,11 @@
+/* eslint-disable jsx-a11y/alt-text */
 import { Button, Grid, Typography } from "@mui/material";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import logo from "../assets/haloeslogo.png";
+import ReactSignatureCanvas from "react-signature-canvas";
 const EventAttendanceForm = (props) => {
+  const sigCanvas = useRef();
   const [formData, setFormData] = useState({
     fullName: "",
     position: "",
@@ -10,7 +13,8 @@ const EventAttendanceForm = (props) => {
     signature: "",
   });
   const currentDate = moment(new Date()).format("YYYY-MM-DD HH:mm");
-  const [submitted, setSubmitted] = useState(false);
+  const [isRefresh, setIsRefresh] = useState(false);
+  const [isSigned, setIsSigned] = useState(false);
   const [isMobile, setIsMobile] = useState(
     typeof window !== "undefined" && window.innerWidth < 1024
   );
@@ -36,21 +40,24 @@ const EventAttendanceForm = (props) => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (
-      !formData.fullName ||
-      !formData.position ||
-      !formData.phone ||
-      !formData.signature
-    ) {
-      alert("All fields are required!");
-      return;
-    }
-    setSubmitted(true);
+  const onBeginHandler = () => {
+    setIsSigned(true);
   };
+  const clearSignatureHandler = () => {
+    sigCanvas.current?.clear();
+    setIsSigned(false);
+  };
+
+  const isConfirmDisabledHandler = () => {
+    if (!isSigned) {
+      return true;
+    }
+    return false;
+  };
+
   const confirmAttendanceHandler = () => {
+    const signImg = sigCanvas.current?.getCanvas().toDataURL("image/png");
+    console.log("[Saved Image]", signImg);
     props.history.push(`/presentation?cd=12345`);
   };
   return (
@@ -103,16 +110,43 @@ const EventAttendanceForm = (props) => {
               <div>
                 <label>Phone: 925-876-7917</label>
               </div>
-              <label>
-                Signature (Type your name):
-                <input
-                  type="text"
-                  name="signature"
-                  value={formData.signature}
-                  onChange={handleChange}
-                  required
+
+              <div align="left" style={{ paddingTop: 5 }}>
+                <Typography style={{ color: "black" }} variant="body">
+                  Signature
+                </Typography>
+              </div>
+              <div
+                align="left"
+                style={{
+                  border: "1px solid black",
+                  background: "white",
+                  width: "300px",
+                }}
+              >
+                <ReactSignatureCanvas
+                  penColor="green"
+                  onBegin={(e) => onBeginHandler(e)}
+                  ref={(ref) => {
+                    sigCanvas.current = ref;
+                  }}
+                  canvasProps={{
+                    height: 80,
+                    width: 300,
+                    background: "white",
+                    className: "sigCanvas",
+                  }}
                 />
-              </label>
+              </div>
+              <div align="left" style={{ paddingTop: 5 }}>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={clearSignatureHandler}
+                >
+                  Clear
+                </Button>
+              </div>
 
               <p>
                 I, the undersigned, confirm my attendance at the above-mentioned
@@ -129,6 +163,7 @@ const EventAttendanceForm = (props) => {
               <Button
                 variant="contained"
                 color="primary"
+                disabled={!isSigned}
                 onClick={() => confirmAttendanceHandler()}
               >
                 Confirm Attendance

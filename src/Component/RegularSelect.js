@@ -5,30 +5,40 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 
-export default function RegularSelect() {
-  const [age, setAge] = React.useState("");
-
+export default function RegularSelect(props) {
+  const [key, setKey] = React.useState(props.seq || "");
+  React.useEffect(() => {
+    setKey(props.seq || 0);
+  }, [props.seq]);
   const handleChange = (event) => {
-    setAge(event.target.value);
+    setKey(event.target.value);
+    props.onChangeHandler(event.target.value);
+  };
+  const disabledHandler = (item, h) => {
+    if (item.topic === "HIPAA" && props.currentSeq >= h) {
+      return false;
+    }
+    return true;
   };
 
   return (
-    <Box sx={{ minWidth: 120 }}>
-      <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">Age</InputLabel>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={age}
-          label="Age"
-          style={{ background: "white" }}
-          onChange={handleChange}
-        >
-          <MenuItem value={10}>Ten</MenuItem>
-          <MenuItem value={20}>Twenty</MenuItem>
-          <MenuItem value={30}>Thirty</MenuItem>
-        </Select>
-      </FormControl>
+    <Box sx={{ minWidth: props.width || 120, height: 32 }}>
+      <Select
+        labelId="demo-simple-select-label"
+        id="demo-simple-select"
+        value={key}
+        style={{ background: "white", height: 28, width: props.width || 120 }}
+        onChange={handleChange}
+      >
+        {props?.options?.map((row, h) => (
+          <MenuItem
+            value={row.value || row.seq}
+            disabled={disabledHandler(row, h)}
+          >
+            {row.label || row.title}
+          </MenuItem>
+        ))}
+      </Select>
     </Box>
   );
 }

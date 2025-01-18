@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 import { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import logo from "../assets/haloeslogo.png";
@@ -12,14 +13,19 @@ import { employeeListStateSelector } from "../store/selectors/employeeSelector";
 import { HIPAA_QUIZ_ANSWER, IN_SERVICES } from "../utils/constants";
 import SlidePage from "./Slide";
 import { useRef } from "react";
+import RegularSelect from "../Component/RegularSelect";
+
 let correctScore = 0;
+
 const { Typography, Grid, Button } = require("@mui/material");
 
 const PresentationPage = (props) => {
   const scrollRef = useRef(null);
   const [answers, setAnswers] = useState([]);
   const [topic, setTopic] = useState({});
+  const [topics, setTopics] = useState([]);
   const [seq, setSeq] = useState(0);
+  const [currentSeq, setCurrentSeq] = useState(0);
   const [showScore, setShowScore] = useState(false);
   const [isMobile, setIsMobile] = useState(
     typeof window !== "undefined" && window.innerWidth < 1024
@@ -54,7 +60,8 @@ const PresentationPage = (props) => {
 
   useEffect(() => {
     const t = IN_SERVICES.find((f) => f.seq === seq && f.topic === "HIPAA");
-
+    const ts = IN_SERVICES.filter((f) => f.topic === "HIPAA");
+    setTopics(ts);
     setTopic(t);
   }, [seq]);
   useEffect(() => {
@@ -99,18 +106,27 @@ const PresentationPage = (props) => {
       // update seq of employee
       correctScore = parseInt((correctScore / 20) * 100);
       setShowScore(true);
-      setSeq(seq + 1);
     } else {
       setSeq(seq + 1);
+      setCurrentSeq(seq + 1);
     }
   };
   const prevSeqHandler = () => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = 0;
     }
+
     if (seq >= 1) {
       setSeq(seq - 1);
     }
+  };
+  const downloadCertificateHandler = () => {
+    setShowScore(false);
+    setSeq(seq + 1);
+    setCurrentSeq(seq + 1);
+  };
+  const topicHandler = (key) => {
+    setSeq(key);
   };
   const collectAnswerHandler = (quizList) => {
     console.log("[ANSWERS]", quizList);
@@ -134,8 +150,12 @@ const PresentationPage = (props) => {
     if (seq === 10 && topic.topic === "HIPAA" && answers?.length !== 20) {
       return true;
     }
+
     if (seq === 10 && topic.topic === "HIPAA" && answers?.length === 20) {
       return false;
+    }
+    if (seq === 11 && topic.topic === "HIPAA") {
+      return true;
     }
     if (!isAtBottom && isScrollbarVisible) {
       return true;
@@ -159,14 +179,34 @@ const PresentationPage = (props) => {
                   <Typography variant="h5" style={{ color: "white" }}>
                     {"HIPAA Compliance"}
                   </Typography>
-                  <div style={{ paddingLeft: 10 }}>
+                  <div style={{ paddingLeft: 4 }}>
                     <Typography variant="body2" style={{ color: "white" }}>
-                      Inservice Training
+                      In-Service Training (Due Date January 31, 2025)
                     </Typography>
                   </div>
                 </div>
                 <img src={logo} width="200px" height="60px" />
               </Grid>
+            </div>
+          </Grid>
+          <Grid item md={12} sm={12}>
+            <div
+              style={{
+                width: !isMobile ? "90%" : "98%",
+              }}
+              align="right"
+            >
+              <div style={{ display: "inline-flex", gap: 10 }}>
+                <Typography variant="body2">Select Topic</Typography>
+                <RegularSelect
+                  seq={seq}
+                  currentSeq={currentSeq}
+                  title={"Topic"}
+                  width={500}
+                  options={topics}
+                  onChangeHandler={topicHandler}
+                />
+              </div>
             </div>
           </Grid>
           <Grid item md={12} sm={12}>
@@ -216,6 +256,7 @@ const PresentationPage = (props) => {
           <QuizModal
             score={correctScore}
             isOpen={showScore}
+            downloadCertificateHandler={downloadCertificateHandler}
             onCloseHandler={() => setShowScore(false)}
           />
         )}

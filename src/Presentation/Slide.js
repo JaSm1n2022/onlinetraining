@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import HIPAACertificate from "../Hipaa/Certificate";
 import HIPAAConclusion from "../Hipaa/Conclusion";
 import HIPAAHealthInfoProtected from "../Hipaa/HealthInformation";
 import HIPAAIntroduction from "../Hipaa/Introduction";
@@ -6,7 +7,7 @@ import HIPAAObjectives from "../Hipaa/Objective";
 import HIPAAPatientConsent from "../Hipaa/PatientConsent";
 import HIPAAPracticalImplications from "../Hipaa/PracticalImplication";
 import HIPAAPurpose from "../Hipaa/Purpose";
-import HipaaQuiz from "../Hipaa/Quiz";
+import HIPAAQuiz from "../Hipaa/Quiz";
 
 import HIPAAResearch from "../Hipaa/Research";
 import HIPAAInfo from "../Hipaa/Undestanding";
@@ -71,9 +72,11 @@ const SlidePage = (props) => {
                 ) : props.seq === 9 && props.inservices?.topic === "HIPAA" ? (
                   <HIPAAConclusion />
                 ) : props.seq === 10 && props.inservices?.topic === "HIPAA" ? (
-                  <HipaaQuiz
+                  <HIPAAQuiz
                     collectAnswerHandler={props.collectAnswerHandler}
                   />
+                ) : props.seq === 11 && props.inservices?.topic === "HIPAA" ? (
+                  <HIPAACertificate />
                 ) : null}
               </div>
             </div>

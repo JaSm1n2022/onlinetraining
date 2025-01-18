@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const HipaaQuiz = (props) => {
+const HIPAAQuiz = (props) => {
   const questions = [
     {
       question:
@@ -182,4 +182,4 @@ const HipaaQuiz = (props) => {
   );
 };
 
-export default HipaaQuiz;
+export default HIPAAQuiz;
